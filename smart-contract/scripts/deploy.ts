@@ -1,13 +1,14 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
+  const name: string = "Tether USD";
+  const symbol: string = "USDT";
+  const totalSupply: bigint = 1_000_000n * 10n ** 6n;
+  const Token = await ethers.getContractFactory("Token");
+  const token = await Token.deploy(totalSupply, name, symbol);
+  await token.waitForDeployment();
 
-  const KingToken = await ethers.getContractFactory("KingToken");
-  const contract = await KingToken.deploy("Tether USD", "USDT", 1_000_000n, 6);
-
-  console.log("Contract deployed at: ", contract.target);
+  console.log("Token successfully deployed: ", token.target);
 }
 
 main()
