@@ -1,6 +1,5 @@
-import { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
-import "@nomicfoundation/hardhat-toolbox-viem";
-import "@nomicfoundation/hardhat-ignition-viem";
+import { NetworkUserConfig, HardhatUserConfig } from "hardhat/types";
+import "@nomicfoundation/hardhat-toolbox";
 require("dotenv").config();
 
 const holesky: NetworkUserConfig = {
@@ -11,13 +10,22 @@ const holesky: NetworkUserConfig = {
 
 const config: HardhatUserConfig = {
   defaultNetwork: "holesky",
+  solidity: {
+    compilers: [{ version: "0.8.24" }],
+    settings: {
+      optimizer: {
+        enabled: false,
+        runs: 99999,
+      },
+    },
+  },
   networks: {
     hardhat: {},
-    ...{ holesky },
+    ...(process.env.KEY_TESTNET && { holesky }),
   },
   etherscan: {
     apiKey: {
-      holesky: "2VPQC6NNB1AEJI2P3GQA73C9UZ823EFY3F",
+      holesky: process.env.ETHERSCAN_API_KEY,
     },
     customChains: [
       {
@@ -30,11 +38,10 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  solidity: "0.8.24",
   paths: {
     sources: "./contracts",
     tests: "./test",
-    cache: "/cache",
+    cache: "./cache",
     artifacts: "./artifacts",
   },
 };

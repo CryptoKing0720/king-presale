@@ -11,8 +11,8 @@ abstract contract ERC20 is IERC20 {
         uint256 value
     );
     uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    mapping(address => uint256) public _balanceOf;
+    mapping(address => mapping(address => uint256)) public _allowance;
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -27,14 +27,14 @@ abstract contract ERC20 is IERC20 {
         address recipient,
         uint256 amount
     ) external returns (bool) {
-        balanceOf[msg.sender] -= amount;
-        balanceOf[recipient] += amount;
+        _balanceOf[msg.sender] -= amount;
+        _balanceOf[recipient] += amount;
         emit Transfer(msg.sender, recipient, amount);
         return true;
     }
 
     function approve(address spender, uint256 amount) external returns (bool) {
-        allowance[msg.sender][spender] = amount;
+        _allowance[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
         return true;
     }
@@ -44,21 +44,21 @@ abstract contract ERC20 is IERC20 {
         address recipient,
         uint256 amount
     ) external returns (bool) {
-        allowance[sender][msg.sender] -= amount;
-        balanceOf[sender] -= amount;
-        balanceOf[recipient] += amount;
+        _allowance[sender][msg.sender] -= amount;
+        _balanceOf[sender] -= amount;
+        _balanceOf[recipient] += amount;
         emit Transfer(sender, recipient, amount);
         return true;
     }
 
     function _mint(address to, uint256 amount) internal {
-        balanceOf[to] += amount;
+        _balanceOf[to] += amount;
         totalSupply += amount;
         emit Transfer(address(0), to, amount);
     }
 
     function _burn(address from, uint256 amount) internal {
-        balanceOf[from] -= amount;
+        _balanceOf[from] -= amount;
         totalSupply -= amount;
         emit Transfer(from, address(0), amount);
     }
