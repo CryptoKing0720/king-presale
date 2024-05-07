@@ -20,7 +20,7 @@ interface IPreSale {
 
     error NotRefundable();
 
-    error LiquificationFalled();
+    error LiquificationFailed();
 
     error InvalidInitializationParameters();
 
