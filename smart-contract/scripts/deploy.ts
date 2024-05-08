@@ -1,5 +1,14 @@
 import { ethers } from "hardhat";
 
+const verify = async (address: string, parameter: any[] = []) => {
+  console.log(`Veryfing ${address} ...`);
+  await run("verify:verify", {
+    address: address,
+    constructorArguments: parameter,
+  });
+  console.log("Success!");
+};
+
 async function main() {
   const name: string = "Tether USD";
   const symbol: string = "USDT";
@@ -9,15 +18,19 @@ async function main() {
   await token.waitForDeployment();
 
   console.log("Token successfully deployed: ", token.target);
+  await verify("0x3B0b1e1d718059C45A02983792fBD2585c3d74cC", [
+    totalSupply,
+    name,
+    symbol,
+  ]);
 
-  const WETH = await ethers.getContractFactory("WETH");
-  const weth = await WETH.deploy();
-  await weth.waitForDeployment();
+  // const WETH = await ethers.getContractFactory("WETH");
+  // const weth = await WETH.deploy();
+  // await weth.waitForDeployment();
 
-  console.log("WETH successufully deployed: ", weth.target);
+  // console.log("WETH successufully deployed: ", weth.target);
 
-  const wethContract = await ethers.getContractAt("WETH", weth.target);
-  await wethContract.deposit({ value: 3_000_000_000_000_000_000n });
+  // await verify(weth.target.toString());
 }
 
 main()

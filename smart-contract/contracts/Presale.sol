@@ -100,6 +100,8 @@ contract PreSale is IPreSale, Ownable {
         pool.tokensLiquidity = _tokensForLiquidity();
         pool.tokensClaimable = _tokensForPreSale();
 
+        pool.token.approve(address(pool.pancakeRouter02), pool.tokenBalance);
+
         IERC20(pool.token).safeTransferFrom(
             msg.sender,
             address(this),
@@ -119,11 +121,12 @@ contract PreSale is IPreSale, Ownable {
 
         pool.state = 4;
         uint256 liquidityWei = _weiForLiquidity();
-        _liquidify(liquidityWei, pool.tokensLiquidity);
+        _liquify(liquidityWei, pool.tokensLiquidity);
         pool.tokenBalance -= pool.tokensLiquidity;
 
         uint256 withdrawable = pool.weiRaised - liquidityWei;
-        if (withdrawable > 0) payable(msg.sender).sendValue(withdrawable);
+        if (withdrawable > 0)
+            Address.sendValue(payable(msg.sender), withdrawable);
 
         emit Finalized(msg.sender, pool.weiRaised, block.timestamp);
 
@@ -165,7 +168,7 @@ contract PreSale is IPreSale, Ownable {
 
         if (address(this).balance >= amount) {
             contributions[msg.sender] = 0;
-            payable(msg.sender).sendValue(amount);
+            Address.sendValue(payable(msg.sender), amount);
             emit Refund(msg.sender, amount, block.timestamp);
         }
 
@@ -180,7 +183,7 @@ contract PreSale is IPreSale, Ownable {
         emit Purchase(beneficiary, amount);
     }
 
-    function _liquidify(uint256 _weiAmount, uint256 _tokenAmount) private {
+    function _liquify(uint256 _weiAmount, uint256 _tokenAmount) private {
         (uint amountToken, uint amountETH, ) = pool
             .pancakeRouter02
             .addLiquidityETH{value: _weiAmount}(
